@@ -30,9 +30,11 @@ __title__ = 'PiClima'
 __author__ = 'Daniel Geraldi'
 __license__ = 'MIT'
 
+#***************************************************
 import datetime
 import time
 import logging
+from logging.handlers import RotatingFileHandler
 import sys
 import MySQLdb as mysql
 import pymongo
@@ -53,6 +55,7 @@ class Sensor:
 		self.SECRET_MONGO = config('SECRET_MONGO')
 		self.USER_MONGO = config('USER_MONGO')
 		self.LOCAL_ALTITUDE = config('LOCAL_ALTITUDE')
+
 		self.ts = time.time()
 		self.dataHora = 0
 		self.temp = 0
@@ -61,8 +64,20 @@ class Sensor:
 		self.altitude = 0
 
 		#Create a new object sensor in ultra resolution
-		#BMP085_STANDARD, BMP085_HIGHRES,BMP085_ULTRAHIGHRES.
+		#OPTIONS: BMP085_STANDARD, BMP085_HIGHRES,BMP085_ULTRAHIGHRES.
 		self.sensor = BMP085.BMP085(mode=BMP085.BMP085_ULTRAHIGHRES)
+
+		#Create rotating log files, alternating between 5 files when the file reaches 5MB
+		logFormatter = logging.Formatter('%(asctime)s - %(levelname)s - %(funcName)s(%(lineno)d) - %(message)s',"%d-%m-%Y %H:%M:%S")
+		logFile = './log/sensor_temp.log'
+		logHandler = RotatingFileHandler(logFile, mode='a', maxBytes=5*1024*1024, 
+                                 backupCount=3, encoding=None, delay=0)
+		logHandler.setFormatter(logFormatter)
+		logHandler.setLevel(logging.INFO)
+
+		self.logger = logging.getLogger('SENSOR_TEMP')
+		self.logger.setLevel(logging.INFO)
+		self.logger.addHandler(logHandler)
 
 
 	#*********************************************************
@@ -92,12 +107,11 @@ class Sensor:
 			Default Database: tempodg
 			DEFAULT Table: log_temperatura
 		"""
-
-		#Connect to the local database - MYSQL
-		db = mysql.connect("localhost",self.USER_SQL,self.SECRET_SQL,self.SQLDBNAME)#host,user,password,database
-		cursor = db.cursor()
-
 		try:
+			#Connect to the local database - MYSQL
+			db = mysql.connect("localhost",self.USER_SQL,self.SECRET_SQL,self.SQLDBNAME)#host,user,password,database
+			cursor = db.cursor()
+
 			#Insert into DB
 			sql = "Insert into "+ self.SQLTABLENAME +" (temperatura,pressao,altitude,pressao_abs) \
 			VALUES ('%s','%s','%s','%s')" % \
@@ -106,9 +120,13 @@ class Sensor:
 			cursor.execute(sql)
 			db.commit()
 			db.close()
+
 			print("SUCCESS: Data sent to the local database!")
+			self.logger.info("Data sent to the local database! Temp: %s;Rel Press:%s;Alt:%s ", self.temp, float("{0:0.2f}".format(self.pressao)),self.LOCAL_ALTITUDE)
 		except mysql.Error as e:
-			print("ERROR: was not possible to save data on local database:: ", e)
+			print("ERROR: was not possible to save data on LOCAL database:: ", e)
+			self.logger.exception("Failure to save data on LOCAL database::")
+
 			db.rollback()
 			return False
 
@@ -125,14 +143,12 @@ class Sensor:
 			Default Table=weather_dg
 			Default Collection=log_temperatura
 		"""
-
-		#Envia copia para banco mongodb em nuvem
-		mongo_uri = "mongodb+srv://"+self.USER_MONGO+":"+ urllib.parse.quote_plus(self.SECRET_MONGO)+"@cluster0.tdpte.mongodb.net/weather_dg?retryWrites=true&w=majority"
-
 		try:
+			#Envia copia para banco mongodb em nuvem
+			mongo_uri = "mongodb+srv://"+self.USER_MONGO+":"+ urllib.parse.quote_plus(self.SECRET_MONGO)+"@cluster0.tdpte.mongodb.net/weather_dg?retryWrites=true&w=majority"
+
 			client = pymongo.MongoClient(mongo_uri,ssl=True,ssl_cert_reqs='CERT_NONE')
 			#db = client.test
-			print("SUCCESS: Connected to the cloud database.")
 
 			#Seleciona o database
 			db = client.weather_dg
@@ -148,11 +164,16 @@ class Sensor:
 				"pressao_abs":float("{0:0.2f}".format(self.pressao)),
 				"altitude": int(self.LOCAL_ALTITUDE)
 				}
+
 			#Insere documento um a um
 			collection.insert_one(document)
 			print("SUCCESS: Data sent to the cloud database.")
+			self.logger.info("Data sent to the cloud database! Temp: %s;Rel Press:%s;Alt:%s ", self.temp, float("{0:0.2f}".format(self.pressao)),self.LOCAL_ALTITUDE)
+
 		except Exception as e:
-			print("ERROR: was not possible to save data on cloud database:: ",e)
+			print("ERROR: was not possible to save data on CLOUD database:: ",e)
+			self.logger.exception("Failure to save data on CLOUD database::")
+
 			return False
 
 

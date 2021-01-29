@@ -2,15 +2,18 @@
 
 ![GitHub](https://img.shields.io/github/license/dgeraldi/PiClima?style=plastic)  ![GitHub last commit](https://img.shields.io/github/last-commit/dgeraldi/PiClima?style=plastic)
 
+
 ## ***1 OBJETIVO***
 
 Este projeto visa capturar dados de sensores ligados a um raspberry pi e armazenamento em bases de dados para consulta online via frontend.
+
 
 ## ***2 ARQUITETURA***
 
 Arquitetura (alto nível)
 
 ![alt text](https://github.com/dgeraldi/PiClima/blob/main/Files/PiClima.png)
+
 
 ## ***3 INSTALAÇÃO***
 
@@ -30,7 +33,7 @@ Software:
   
 Hardware:
 
-* Raspberry Pi (aqui na versão 3) com Raspbian (não testado com versões recentos do SO)
+* Raspberry Pi (aqui na versão 3) com Raspbian (não testado com outras versões)
 * Sensor de Pressão Barométrica BMP180
 
   
@@ -141,7 +144,9 @@ Table: log_temperatura
 Após instalado o mysql com o método preferido, faz-se necessário criar a tabela e o database, para isso, acesso pelo terminao o mysql e digite:
 
 a. Criar database
-```create database tempodg;```
+```sql
+create database tempodg;
+```
 
 b. Criar tabela
 ```sql 
@@ -176,21 +181,32 @@ Collection: log_temperatura (Atualizar no script com o novo nome)
 
 #### 3.2.3 Executando e Agendando Execução automática
 
-Para executar basta digitar ```python3 sensor_temp.py``` ou o nome dado ao script.
+Copie o script para o raspberry pi e crie um arquivo no diretório chamado .env com o seguinte conteúdo:
+```
+SQLDBNAME= <SQL_DB_NAME>
+SQLTABLENAME= <SQL_TABLE_NAME>
+USER_SQL= <SQL_USER_LOGIN>
+SECRET_SQL= <SQL_DB_PASSWORD>
+USER_MONGO= <MONGO_USER_LOGIN>
+SECRET_MONGO= <MONGO_PASSWORD>
+LOCAL_ALTITUDE= <ALTITUDE_FROM_YOUR_LOCATION>
+```
 
-Para realizar coleta automática de tempos em tempos, basta realizar o agendamento para execução automática utilizando o crontab.
+Após, para executar basta digitar o comando ```python3 sensor_temp.py``` no terminal.
 
-No terminal digite
+Para realizar coleta de forma automática de tempos em tempos, basta realizar o agendamento para execução automática utilizando o crontab.
+
+No terminal digite:
 ```console
 foo@bar:~$ crontab -e
 ```
 
 E insira a seguinte linha no final do arquivo para agendar a execução a cada 30 minutos o script localizado no diretorio home
 
-
 ```console
 */30 * * * * python3 ~/sensor_temp.py
 ```
+
 
 ## ***Checklist - Macro***
 
