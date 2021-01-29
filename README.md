@@ -144,13 +144,19 @@ a. Criar database
 ```create database tempodg;```
 
 b. Criar tabela
-```CREATE TABLE `log_temperatura` ( `codTemperatura` int(11) NOT NULL AUTO_INCREMENT,  `dataLog` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `temperatura` decimal(4,2) NOT NULL,  `pressao` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressao_abs` decimal(7,2) NOT NULL, PRIMARY KEY (`codTemperatura`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;```
+```sql 
+CREATE TABLE `log_temperatura` ( `codTemperatura` int(11) NOT NULL AUTO_INCREMENT,  `dataLog` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `temperatura` decimal(4,2) NOT NULL,  `pressao` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressao_abs` decimal(7,2) NOT NULL, PRIMARY KEY (`codTemperatura`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+```
 
 c. Criar um usuário no mysql
-```create user 'USUARIO'@'localhost' IDENTIFIED BY 'SENHA';```
+```sql 
+create user 'USUARIO'@'localhost' IDENTIFIED BY 'SENHA';
+```
 
 d. Garantir acesso ao banco
-```grant all privileges on tempodg.* to 'USUARIO'@'localhost';```
+```sql 
+grant all privileges on tempodg.* to 'USUARIO'@'localhost';
+```
 
 #### 3.2.2 Banco de dados MongoDB
 
