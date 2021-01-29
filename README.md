@@ -88,7 +88,7 @@ Para este projeto utilizei o python3.9 para coleta dos dados dos sensores, para 
 #Download da versão desejada
 foo@bar:~$ wget https://www.python.org/ftp/python/3.9.0/Python-3.9.0.tar.xz
 foo@bar:~$ tar -xvf Python-3.9.0.tar.xz
-foo@bar:~$ cd Python-3.0.0
+foo@bar:~$ cd Python-3.9.0
 
 #Configure passando o openssl como parâmetro
 foo@bar:~$ ./configure --with-openssl=/usr/local/openssl --enable-optimizations
@@ -104,13 +104,13 @@ foo@bar:~$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/
 
 Algumas das dependências necessárias para o script rodar corretamente:
 
-1. Mysqlclient, pymongo, spidev e dnspython
+a. Mysqlclient, pymongo, spidev e dnspython
 Necessário para conectar com o mysql, mongoDB na nuvem
 
 ```console
 foo@bar:~$ sudo pip3 install mysqlclient pymongo dnspython spidev
 ```
-2. Adafruit BMP180 Python
+b. Adafruit BMP180 Python
 Biblioteca necessária para coletar os dados através do sensor BMP180
 
 ```console
@@ -124,23 +124,40 @@ foo@bar:~$ sudo python3 setup.py install
 
 #### 3.2.1 Banco de Dados MySQL
 
+Utualize o nome do database e table como desejado e atualize o arquivo .env conforme novos nomes.
+
 Database: tempodg
 Table: log_temperatura
 
 | COLUMN_NAME    | COLUMN_TYPE  | COLUMN_KEY | EXTRA          |
 |----------------|--------------|------------|----------------|
-| codTemperatura | int(11)      | PRI        | auto_increment |
+| codTemperatura | int(11)      | PK         | auto_increment |
 | dataLog        | timestamp    |            |                |
 | temperatura    | decimal(4,2) |            |                |
 | pressao        | decimal(7,2) |            |                |
 | altitude       | int(4)       |            |                |
 | pressao_abs    | decimal(7,2) |            |                |
 
+Após instalado o mysql com o método preferido, faz-se necessário criar a tabela e o database, para isso, acesso pelo terminao o mysql e digite:
+
+a. Criar database
+```create database tempodg;```
+
+b. Criar tabela
+```CREATE TABLE `log_temperatura` ( `codTemperatura` int(11) NOT NULL AUTO_INCREMENT,  `dataLog` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `temperatura` decimal(4,2) NOT NULL,  `pressao` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressao_abs` decimal(7,2) NOT NULL, PRIMARY KEY (`codTemperatura`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;```
+
+c. Criar um usuário no mysql
+```create user 'USUARIO'@'localhost' IDENTIFIED BY 'SENHA';```
+
+d. Garantir acesso ao banco
+```grant all privileges on tempodg.* to 'USUARIO'@'localhost';```
 
 #### 3.2.2 Banco de dados MongoDB
 
-Database: weather_dg
-Collection: log_temperatura
+Para os serviços de banco de dados MONGO foi utilizado o MONGODB ATLAS.
+
+Database: weather_dg (Atualizar no script posteriormente com o novo nome)
+Collection: log_temperatura (Atualizar no script com o novo nome)
 
 | COLUMN     |
 |------------|
@@ -150,6 +167,24 @@ Collection: log_temperatura
 | pressao    |
 | pressao_abs|
 | altitude   |
+
+#### 3.2.3 Executando e Agendando Execução automática
+
+Para executar basta digitar ```python3 sensor_temp.py``` ou o nome dado ao script.
+
+Para realizar coleta automática de tempos em tempos, basta realizar o agendamento para execução automática utilizando o crontab.
+
+No terminal digite
+```console
+foo@bar:~$ crontab -e
+```
+
+E insira a seguinte linha no final do arquivo para agendar a execução a cada 30 minutos o script localizado no diretorio home
+
+
+```console
+*/30 * * * * python3 ~/sensor_temp.py
+```
 
 ## ***Checklist - Macro***
 
