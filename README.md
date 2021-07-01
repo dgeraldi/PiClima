@@ -192,7 +192,7 @@ SECRET_MONGO= <MONGO_PASSWORD>
 LOCAL_ALTITUDE= <ALTITUDE_FROM_YOUR_LOCATION>
 ```
 
-Após, para executar basta digitar o comando ```python3 sensor_temp.py``` no terminal.
+Após, para executar basta digitar o comando ```python3 main.py``` no terminal.
 
 Para realizar coleta de forma automática de tempos em tempos, basta realizar o agendamento para execução automática utilizando o crontab.
 
@@ -204,7 +204,7 @@ foo@bar:~$ crontab -e
 E insira a seguinte linha no final do arquivo para agendar a execução a cada 30 minutos o script localizado no diretorio home
 
 ```console
-*/30 * * * * python3 ~/sensor_temp.py
+*/30 * * * * python3 ~/main.py
 ```
 
 

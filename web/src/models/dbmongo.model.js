@@ -1,7 +1,11 @@
+'use strict';
+
+//Connects to mongo database usine native driver
+
 const MongoClient = require("mongodb").MongoClient;
 const config = require('../config/env.config');
 
-
+//Change this line in case of a new custom connection URL
 const uri = `mongodb+srv://${config.app.mongoUser}:${config.app.mongoSecret}@cluster0.tdpte.mongodb.net/${config.app.mongoDB}?retryWrites=true&w=majority`;
 
 // Create a new MongoClient
