@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module main</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>main</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/pi/PiClima/main.py">/home/pi/PiClima/main.py</a></font></td></tr></table>
+    <p><tt>Call&nbsp;all&nbsp;sensors&nbsp;classes&nbsp;and&nbsp;save&nbsp;the&nbsp;data&nbsp;into&nbsp;databases<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Reads&nbsp;all&nbsp;sensors&nbsp;using&nbsp;raspberry&nbsp;pi&nbsp;3&nbsp;and&nbsp;save&nbsp;<br>
+the&nbsp;data&nbsp;into&nbsp;databases,&nbsp;one&nbsp;local&nbsp;(mysql)&nbsp;and&nbsp;<br>
+another&nbsp;in&nbsp;cloud&nbsp;(mongodb).<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;local&nbsp;database&nbsp;is&nbsp;used&nbsp;to&nbsp;have&nbsp;all&nbsp;data&nbsp;in&nbsp;a&nbsp;local&nbsp;network<br>
+&nbsp;&nbsp;&nbsp;&nbsp;as&nbsp;a&nbsp;backup&nbsp;in&nbsp;case&nbsp;of&nbsp;some&nbsp;internet&nbsp;failure.<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Execution<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Just&nbsp;run&nbsp;manually&nbsp;on&nbsp;terminal:&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;python3&nbsp;main.py<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Or&nbsp;create&nbsp;a&nbsp;schedule&nbsp;running&nbsp;the&nbsp;command&nbsp;line&nbsp;'crontab&nbsp;-e'&nbsp;with&nbsp;the&nbsp;line&nbsp;inside:<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/30&nbsp;*&nbsp;*&nbsp;*&nbsp;*&nbsp;python3&nbsp;~/PiClima/main.py<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Args<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;any&nbsp;argument&nbsp;is&nbsp;passed&nbsp;in&nbsp;command&nbsp;line&nbsp;after&nbsp;the&nbsp;script&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;some&nbsp;extra&nbsp;data&nbsp;will&nbsp;be&nbsp;printed&nbsp;on&nbsp;terminal&nbsp;but&nbsp;without&nbsp;saving&nbsp;it<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it&nbsp;in&nbsp;databases.<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;python3&nbsp;main.py&nbsp;SOME_ARG</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top></td><td width="25%" valign=top></td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>__license__</strong> = 'MIT'<br>
+<strong>__title__</strong> = 'PiClima - Main'<br>
+<strong>objSensor</strong> = &lt;classes.sensor_pressure.SensorPressure object&gt;</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#7799ee">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Author</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#7799ee"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Daniel&nbsp;Geraldi</td></tr></table>
+</body></html>
