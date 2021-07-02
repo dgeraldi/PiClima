@@ -36,7 +36,7 @@ from decouple import config
 class DB:
 	"""Main class that collect all data and save into databases"""
 
-	def __init__(self,temperature,relativePressure,localAltitude,absolutePressure):
+	def __init__(self,press_temperature,relativePressure,localAltitude,absolutePressure, humidity, hum_temperature):
 		"""Init all variables and get all environment variables"""
 
 		self.SQLDBNAME = config('SQLDBNAME')
@@ -47,17 +47,19 @@ class DB:
 		self.USER_MONGO = config('USER_MONGO')
 
 		self.ts = time.time()
-		self.dataHora = 0
+		self.created = 0
 
-		self.temperature = temperature
-		self.relativePressure = relativePressure
+		self.press_temperature = press_temperature
+		self.pressure_rel = relativePressure
 		self.localAltitude = localAltitude
-		self.absolutePressure = absolutePressure
+		self.pressure_abs = absolutePressure
+		self.humidity = humidity
+		self.hum_temperature = hum_temperature
 
 		
 		#Create rotating log files, alternating between 5 files when the file reaches 5MB
 		logFormatter = logging.Formatter('%(asctime)s - %(levelname)s - %(funcName)s(%(lineno)d) - %(message)s',"%d-%m-%Y %H:%M:%S")
-		logFile = './log/db.log'
+		logFile = '/var/log/PiClima/db.log'
 		logHandler = RotatingFileHandler(logFile, mode='a', maxBytes=5*1024*1024, 
                                  backupCount=3, encoding=None, delay=0)
 		logHandler.setFormatter(logFormatter)
@@ -86,18 +88,18 @@ class DB:
 			cursor = db.cursor()
 
 			#Insert into DB
-			sql = "Insert into "+ self.SQLTABLENAME +" (temperatura,pressao,altitude,pressao_abs) \
-			VALUES ('%s','%s','%s','%s')" % \
-			( self.temperature, self.relativePressure, self.localAltitude, self.absolutePressure)
+			sql = "Insert into "+ self.SQLTABLENAME +" (press_temperature,pressure,altitude,pressure_abs, humidity, hum_temperature) \
+			VALUES ('%s','%s','%s','%s','%s','%s')" % \
+			( self.press_temperature, self.pressure_rel, self.localAltitude, self.pressure_abs, self.humidity, self.hum_temperature)
 
 			cursor.execute(sql)
 			db.commit()
 			db.close()
 
-			print("SUCCESS: Data sent to the local database.")
-			self.logger.info("Data sent to the local database! Temp: %s;Rel Press:%s;Alt:%s ", self.temperature, float("{0:0.2f}".format(self.absolutePressure)),self.localAltitude)
+			#print("SUCCESS: Data sent to the local database.")
+			self.logger.info("Data sent to the local database! Temp: %s;Rel Press:%s;Alt:%s;Humidity:%s;Hum. Temp:%s", self.press_temperature, float("{0:0.2f}".format(self.pressure_rel)),self.localAltitude,self.humidity,self.hum_temperature)
 		except mysql.Error as e:
-			print("ERROR: was not possible to save data on LOCAL database:: ", e)
+			#print("ERROR: was not possible to save data on LOCAL database:: ", e)
 			self.logger.exception("Failure to save data on LOCAL database::")
 
 			db.rollback()
@@ -121,30 +123,33 @@ class DB:
 			mongo_uri = "mongodb+srv://"+self.USER_MONGO+":"+ urllib.parse.quote_plus(self.SECRET_MONGO)+"@cluster0.tdpte.mongodb.net/weather_dg?retryWrites=true&w=majority"
 
 			client = pymongo.MongoClient(mongo_uri,ssl=True,ssl_cert_reqs='CERT_NONE')
+
+			self.created = datetime.datetime.fromtimestamp(self.ts).strftime('%d-%m-%Y %H:%M:%S') #Date and time
 			#db = client.test
 
-			#Seleciona o database
+			#Select o database
 			db = client.weather_dg
-			#Seleciona a collection
+
+			#Select a collection
 			collection = db.log_temperatura
 
-			#Envia collection para MongoDB
-			#Temp, pressao_rel,altitude,pressao
+			#Send collection para MongoDB
 			document = {
-				"datahora":self.dataHora,
-				"temperatura":self.temperature,
-				"pressao":float("{0:0.2f}".format(self.relativePressure)),
-				"pressao_abs":float("{0:0.2f}".format(self.absolutePressure)),
-				"altitude": int(self.localAltitude)
+				"created":self.created,
+				"press_temperature":self.press_temperature,
+				"pressure":float("{0:0.2f}".format(self.pressure_rel)),
+				"pressure_abs":float("{0:0.2f}".format(self.pressure_abs)),
+				"altitude": int(self.localAltitude),
+				"humidity": self.humidity,
+				"hum_temperature":self.hum_temperature
 				}
 
 			#Insere documento um a um
 			collection.insert_one(document)
-			print("SUCCESS: Data sent to the cloud database.")
-			self.logger.info("Data sent to the cloud database! Temp: %s;Rel Press:%s;Alt:%s ", self.temperature, float("{0:0.2f}".format(self.absolutePressure)),self.localAltitude)
-
+			#print("SUCCESS: Data sent to the cloud database.")
+			self.logger.info("Data sent to the cloud database! Temp: %s;Rel Press:%s;Alt:%s;Humidity:%s;Hum. Temp:%s", self.press_temperature, float("{0:0.2f}".format(self.pressure_rel)),self.localAltitude,self.humidity,self.hum_temperature)
 		except Exception as e:
-			print("ERROR: was not possible to save data on CLOUD database:: ",e)
+			#print("ERROR: was not possible to save data on CLOUD database:: ",e)
 			self.logger.exception("Failure to save data on CLOUD database::")
 
 			return False

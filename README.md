@@ -132,14 +132,16 @@ Utualize o nome do database e table como desejado e atualize o arquivo .env conf
 Database: tempodg
 Table: log_temperatura
 
-| COLUMN_NAME    | COLUMN_TYPE  | COLUMN_KEY | EXTRA          |
-|----------------|--------------|------------|----------------|
-| codTemperatura | int(11)      | PK         | auto_increment |
-| dataLog        | timestamp    |            |                |
-| temperatura    | decimal(4,2) |            |                |
-| pressao        | decimal(7,2) |            |                |
-| altitude       | int(4)       |            |                |
-| pressao_abs    | decimal(7,2) |            |                |
+| COLUMN_NAME          | COLUMN_TYPE  | COLUMN_KEY | EXTRA          |
+|----------------------|--------------|------------|----------------|
+| id                   | int(11)      | PK         | auto_increment |
+| created              | timestamp    |            |                |
+| press_temperature    | decimal(4,2) |            |                |
+| pressure             | decimal(7,2) |            |                |
+| altitude             | int(4)       |            |                |
+| pressure_abs         | decimal(7,2) |            |                |
+| humidity             | decimal(4,2) |            |                |
+| hum_temperature      | decimal(4,2) |            |                |
 
 Após instalado o mysql com o método preferido, faz-se necessário criar a tabela e o database, para isso, acesso pelo terminao o mysql e digite:
 
@@ -150,7 +152,7 @@ create database tempodg;
 
 b. Criar tabela
 ```sql 
-CREATE TABLE `log_temperatura` ( `codTemperatura` int(11) NOT NULL AUTO_INCREMENT,  `dataLog` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `temperatura` decimal(4,2) NOT NULL,  `pressao` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressao_abs` decimal(7,2) NOT NULL, PRIMARY KEY (`codTemperatura`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE `log_temperatura` ( `id` int(11) NOT NULL AUTO_INCREMENT,  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `press_temperature` decimal(4,2) NOT NULL,  `pressure` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressure_abs` decimal(7,2) NOT NULL, `humidity` decimal(4,2) NOT NULL, `hum_temperature` decimal(4,2) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 ```
 
 c. Criar um usuário no mysql
@@ -170,14 +172,16 @@ Para os serviços de banco de dados MONGO foi utilizado o MONGODB ATLAS.
 Database: weather_dg (Atualizar no script posteriormente com o novo nome)
 Collection: log_temperatura (Atualizar no script com o novo nome)
 
-| COLUMN     |
-|------------|
-| _id: index |
-| datahora   |
-| temperatura|
-| pressao    |
-| pressao_abs|
-| altitude   |
+| COLUMN                |
+|-----------------------|
+| _id: index            |
+| created               |
+| press_temperature     |
+| pressure               |
+| pressure_abs           |
+| altitude              |
+| humidity              |
+| hum_temperature       |
 
 #### 3.2.3 Executando e Agendando Execução automática
 
@@ -206,13 +210,3 @@ E insira a seguinte linha no final do arquivo para agendar a execução a cada 3
 ```console
 */30 * * * * python3 ~/main.py
 ```
-
-
-## ***Checklist - Macro***
-
-- [X] Criar bancos: local mysql e mongodb (utilizando serviço cloud Mongo Atlas);
-- [X] Criar script python raspberry pi para coleta de dados e envio aos BD;
-- [ ] Criar página web interna (php) com gráficos para uso rede interna (redundância visto quedas de internet constantes devido nossas ótimas operadoras);
-- [ ] Criar página web em node.js para consulta online via internet;
-- [ ] Criar APIs para consulta de dados;
-- [ ] Criar mecanismo para caso de falha no upload no mongoDB na nuvem, poder enviar os dados posteriormente represados;

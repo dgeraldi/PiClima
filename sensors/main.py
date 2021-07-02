@@ -23,7 +23,7 @@
 		some extra data will be printed on terminal but without saving it
 		it in databases.
 
-		python3 main.py SOME_ARG
+		python3 main.py [humidity | pressure]
 """
 
 __title__ = 'PiClima - Main'
@@ -36,28 +36,50 @@ import sys
 #Import all classes
 from classes.db import DB
 from classes.sensor_pressure import SensorPressure
+from classes.sensor_humidity import SensorHumidity
 
 if __name__ == '__main__':
 	"""Main function that calls everything."""
-    
-    #Create an object to call methods
-objSensor = SensorPressure()
 
 	#If it has no argument, populate variables and save them into databases
 if len(sys.argv)<2:
-		temp, pressao, LOCAL_ALTITUDE,pressao_rel = objSensor.getSensorData()
-		saveDb = DB(temp,pressao_rel,LOCAL_ALTITUDE,pressao)
-		saveDb.saveDBSQL()
-		saveDb.saveDBMongo()
+        #Create an object to call methods
+        objSensorPressure = SensorPressure()
+        objSensorHumidity = SensorHumidity()
+
+        #return from classes the values
+        #Class sensor_presssure
+        press_temperature, pressure_rel, LOCAL_ALTITUDE, pressure_abs = objSensorPressure.getSensorData()
+        #Class sensor_humidity
+        humidity, hum_temperature = objSensorHumidity.getSensorData()
+
+        #Save in databases
+        saveDb = DB(press_temperature,pressure_rel,LOCAL_ALTITUDE,pressure_abs,humidity,hum_temperature)
+        saveDb.saveDBSQL()
+        saveDb.saveDBMongo()
 
 	#If something is passed in arguments, show extra data without saving in database
-if len(sys.argv)>= 2:
-        objSensor.getSensorData()
-        print('Temp = {0:0.2f} *C'.format(objSensor.sensor.read_temperature()))
-        print('Pressao Abs = {0:0.2f} hPa'.format(objSensor.sensor.read_pressure()/100))
-        print('Altitude = {0:0.2f} m'.format(objSensor.sensor.read_altitude()))
-        print('Altitude Real = {0:0.2f} m'.format(objSensor.sensor.read_altitude()))
-        print('Pressao Rel Altitude= {0:0.2f} hPa'.format(objSensor.sensor.read_sealevel_pressure(float(objSensor.sensor.read_altitude()))/100))
-        print('Pressao Rel s/ Altitude= {0:0.2f} hPa'.format(objSensor.sensor.read_sealevel_pressure()/100))
-        print('Pressao Rel Altitude Calculado= {0:0.2f} hPa'.format(objSensor.sensor.read_sealevel_pressure(objSensor.sensor.read_altitude(101325))/100))
-        print('Pressao Rel Altitude Manual= {0:0.2f} hPa'.format(objSensor.sensor.read_sealevel_pressure(float(objSensor.LOCAL_ALTITUDE))/100))
+if len(sys.argv) == 2:
+
+    if sys.argv[1] == 'pressure':
+
+        objSensorPressure = SensorPressure()
+        objSensorPressure.getSensorData()
+
+        print('Temp = {0:0.2f} *C'.format(objSensorPressure.sensor.read_temperature()))
+        print('Pressao Abs = {0:0.2f} hPa'.format(objSensorPressure.sensor.read_pressure()/100))
+        print('Altitude = {0:0.2f} m'.format(objSensorPressure.sensor.read_altitude()))
+        print('Altitude Real = {0:0.2f} m'.format(objSensorPressure.sensor.read_altitude()))
+        print('Pressao Rel Altitude= {0:0.2f} hPa'.format(objSensorPressure.sensor.read_sealevel_pressure(float(objSensorPressure.sensor.read_altitude()))/100))
+        print('Pressao Rel s/ Altitude= {0:0.2f} hPa'.format(objSensorPressure.sensor.read_sealevel_pressure()/100))
+        print('Pressao Rel Altitude Calculado= {0:0.2f} hPa'.format(objSensorPressure.sensor.read_sealevel_pressure(objSensorPressure.sensor.read_altitude(101325))/100))
+        print('Pressao Rel Altitude Manual= {0:0.2f} hPa'.format(objSensorPressure.sensor.read_sealevel_pressure(float(objSensorPressure.LOCAL_ALTITUDE))/100))
+
+    if sys.argv[1]=='humidity':
+        objSensorHumidity = SensorHumidity()
+        humidity, hum_temperature = objSensorHumidity.getSensorData()
+        print('Temp={0:0.1f}C  Humidity={1:0.1f}%'.format(hum_temperature, humidity))
+        
+if len(sys.argv)>2:
+    print('Usage 1 - will save into databases: python main.py')
+    print('Usage 2 - will only show the data: python main.py [humidity | pressure]')

@@ -8,6 +8,9 @@
 
 	Execution
 		Called by main script
+
+	Return
+		press_temperature, pressure_rel, LOCAL_ALTITUDE, pressure_abs
 """
 
 __title__ = 'PiClima - Barometric'
@@ -19,6 +22,7 @@ import datetime
 import time
 import logging
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 import sys
 #import urllib.parse
 import Adafruit_BMP.BMP085 as BMP085
@@ -31,10 +35,9 @@ class SensorPressure:
 		"""Init all variables"""
 
 		self.ts = time.time()
-		self.dataHora = 0
-		self.temp = 0
-		self.pressao = 0
-		self.pressao_rel = 0
+		self.press_temperature = 0
+		self.pressure_abs = 0
+		self.pressure_rel = 0
 		#self.altitude = 0
 
 		#used to fix altitude
@@ -46,13 +49,13 @@ class SensorPressure:
 
 		#Create rotating log files, alternating between 5 files when the file reaches 5MB
 		logFormatter = logging.Formatter('%(asctime)s - %(levelname)s - %(funcName)s(%(lineno)d) - %(message)s',"%d-%m-%Y %H:%M:%S")
-		logFile = './log/sensor_temp.log'
+		logFile = '/var/log/PiClima/sensor_pressure.log'
 		logHandler = RotatingFileHandler(logFile, mode='a', maxBytes=5*1024*1024, 
                                  backupCount=3, encoding=None, delay=0)
 		logHandler.setFormatter(logFormatter)
 		logHandler.setLevel(logging.INFO)
 
-		self.logger = logging.getLogger('SENSOR_TEMP')
+		self.logger = logging.getLogger('SENSOR_PRESS')
 		self.logger.setLevel(logging.INFO)
 		self.logger.addHandler(logHandler)
 
@@ -61,13 +64,13 @@ class SensorPressure:
 	def getSensorData(self):
 		""" Reads sensor data and save them into variables. """
 
-		self.dataHora = datetime.datetime.fromtimestamp(self.ts).strftime('%d-%m-%Y %H:%M:%S') #Data e Hora
-		self.temp = self.sensor.read_temperature() #Temperature
-		self.pressao = self.sensor.read_pressure()/100 #Absolute Pressure
+		#self.dataHora = datetime.datetime.fromtimestamp(self.ts).strftime('%d-%m-%Y %H:%M:%S') #Data e Hora
+		self.press_temperature = self.sensor.read_temperature() #Temperature
+		self.pressure_abs = self.sensor.read_pressure()/100 #Absolute Pressure
 		#self.altitude = self.sensor.read_altitude()
 
 		#Relative Pressure using fixed Altitude due the altitude identified by sensor vary according pressure
 		#causing unreal altitude and sea level's pressure measurement
-		self.pressao_rel = self.sensor.read_sealevel_pressure(float(self.LOCAL_ALTITUDE))/100
+		self.pressure_rel = self.sensor.read_sealevel_pressure(float(self.LOCAL_ALTITUDE))/100
 
-		return self.temp, self.pressao_rel, self.LOCAL_ALTITUDE, self.pressao
+		return self.press_temperature, self.pressure_rel, self.LOCAL_ALTITUDE, self.pressure_abs
