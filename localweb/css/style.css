@@ -1,0 +1,229 @@
+body {
+  
+background: linear-gradient(to bottom, #D5DEE7 0%, #E8EBF2 50%, #E2E7ED 100%), linear-gradient(to bottom, rgba(0,0,0,0.02) 50%, rgba(255,255,255,0.02) 61%, rgba(0,0,0,0.02) 73%), linear-gradient(33deg, rgba(255,255,255,0.20) 0%, rgba(0,0,0,0.20) 100%);
+background-blend-mode: normal,color-burn;
+
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.divTable{
+display: table;
+width: 100%;
+}
+
+.divTableRow {
+display: table-row;
+}
+
+.divTableCell {
+border-style: none;
+display: table-cell;
+padding: 5px;
+}
+
+.divFont {
+font:Helvetica Neue,Arial;
+font-size:14;
+}
+
+.heading-container {
+  text-align: center;
+}
+
+.heading {
+  font-weight: 600;
+}
+
+.card__icon {
+  position: relative;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.main-container {
+  padding: 10px;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card {
+  margin: 20px;
+  padding: 15px;
+  width: 200px;
+  min-height: 100px;
+  display: grid;
+  grid-template-rows: 20px 40px 1fr 40px;
+  border-radius: 10px;
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.25);
+  transition: all 0.5s;
+  font-size: 24px;
+  text-align: center;
+}
+
+.card:hover {
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+  transform: scale(1.05);
+}
+
+.card__icon {
+  grid-row: 2/3;
+  font-size: 30px;
+}
+
+.card__title {
+  grid-row: 3/4;
+  font-weight: 400;
+  color: #ffffff;
+}
+
+.card-1 {
+  /*background: radial-gradient(#1fe4f5, #3fbafe);*/
+  background-image: linear-gradient( 315deg, #97ABFF 10%, #123597 100%);
+}
+
+.card-2 {
+  /*background: radial-gradient(#fbc1cc, #fa99b2);*/
+  background-image: linear-gradient( 315deg, #FFC600 10%, #FD6E6A 100%);
+}
+
+.card-3 {
+  /*background: radial-gradient(#76b2fe, #b69efe);*/
+  background-image: linear-gradient( 315deg, #65FDF0 10%, #1D6FA3 100%);
+}
+
+@media (max-width: 1600px) {
+  .card-container {
+    justify-content: center;
+  }
+}
+
+
+/* HEADER */
+
+@import url(https://fonts.googleapis.com/css?family=Lato:100,300,400|Playfair+Display:400,700,400italic|Libre+Baskerville:400,700,400italic|Muli:300,400|Open+Sans:400,300,700|Oswald:400,700|Raleway:400,100,300,700|Montserrat:400,700|Merriweather:400,300,300italic,400italic,700|Bree+Serif|Vollkorn:400italic,400,700|Abril+Fatface|Cardo:400,400italic);
+
+/* ==== Font sizes(based on Typeplate's scale) ==== */
+html {
+  font: normal 112.5%/1.65 serif; /* base font size 18px with 1.65 line-height */
+  -moz-font-feature-settings: "liga=1, dlig=1"; /* common and discretionary ligatures */
+    -ms-font-feature-settings: "liga", "dlig";
+    -webkit-font-feature-settings: "liga", "dlig";
+    -o-font-feature-settings: "liga", "dlig";
+    font-feature-settings: "liga", "dlig";
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1;
+  margin-top: 0;
+  color: #fff;
+	display: inline-block;
+	position: relative;
+}
+p{
+  margin-top: 4rem;
+  color: #fff;
+  font-size: 0.9rem;
+  line-height: 1
+}
+.tera {
+  font-size: 6.5rem; /* 117 / 18 = 6.5 */
+  margin-bottom: 0.25385rem;
+}
+
+.gamma {
+  font-size: 2rem; /* 36 / 18 = 2 */
+  margin-bottom: 0.825rem;
+}
+
+.epsilon {
+  font-size: 1.16667rem; /* 21 / 18 = 1.1667 */
+  margin-bottom: 1.41429rem;
+}
+
+/* ==== Typefaces  ==== */
+
+.open-sans{font-family: 'Open Sans';}
+.lato{font-family: 'Lato'}
+.playfair-display{font-family: 'Playfair Display'}
+.libre-baskerville{font-family: 'Libre Baskerville'}
+.oswald{font-family: 'Oswald'}
+.montserrat{font-family: 'Montserrat'}
+.vollkorn{font-family: 'Vollkorn'}
+.bree-serif{font-family: 'Bree Serif'}
+.raleway{font-family: 'Raleway'}
+.merriweather{font-family: 'Merriweather'}
+.cardo{font-family: 'Cardo'}
+.abril-fatface{font-family: 'Abril Fatface'}
+.muli{font-family: 'Muli'}
+
+/* ==== Weights, styles, letterspacing, etc. ==== */
+
+.thin{font-weight: 100;}
+.light{font-weight: 300;}
+.regular{font-weight: 400;}
+.bold{font-weight: 700;}
+.italic{font-style: italic;}
+.normal{font-style: normal;}
+.ls-small{letter-spacing: 2px;}
+.ls-medium{letter-spacing: 4px;}
+.ls-large{letter-spacing: 8px;}
+.ls-xlarge{letter-spacing: 12px;}
+.uppercase{text-transform: uppercase;}
+.text-left{text-align: left;}
+
+/* ===== Flourish, heading horizontal lines, etc. ==== */
+/* ==== General styles ==== */
+section{
+	height: 500px;
+	padding: 3rem 0;
+	position: relative;
+}
+
+.wrapper{
+	max-width: 53.33rem;
+	margin: 0 auto 5;
+	position: relative;
+	z-index: 10;
+	transform: translateY(-50%);
+	top:20%;
+	text-align: center;
+}
+
+section:nth-of-type(1){
+	background-image: url(https://download.unsplash.com/photo-1428550670225-15f007f6f1ba);
+  background-size: cover;
+
+}
+section:nth-of-type(5){
+  background: -webkit-linear-gradient(90deg, #134E5E 10%, #71B280 90%); /* Chrome 10+, Saf5.1+ */
+  background:    -moz-linear-gradient(90deg, #134E5E 10%, #71B280 90%); /* FF3.6+ */
+  background:     -ms-linear-gradient(90deg, #134E5E 10%, #71B280 90%); /* IE10 */
+  background:      -o-linear-gradient(90deg, #134E5E 10%, #71B280 90%); /* Opera 11.10+ */
+  background:         linear-gradient(90deg, #134E5E 10%, #71B280 90%); /* W3C */
+          
+}
+
+section:before{
+	content: attr(data-description);
+	font-size: 0.9rem;
+	font-family: 'oswald';
+	color: #fff;
+	position: absolute;
+	z-index: 20;
+	left: 2rem;
+	top: 2rem;
+}
+
+

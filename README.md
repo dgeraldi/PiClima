@@ -29,12 +29,14 @@ Software:
   * dnspython
   * spidev
   * Adafruit Python BMP180
+  * Adafruit Python DHT
 * MySQL
   
 Hardware:
 
 * Raspberry Pi (aqui na versão 3) com Raspbian (não testado com outras versões)
 * Sensor de Pressão Barométrica BMP180
+* Sensor de Umidade e Temperatura DHT11 ou DHT22
 
   
 #### 3.1.1 OpenSSL > v1.1.0 (Opcional), apenas caso ocorra um erro de SSL ao utilizar o pip
@@ -121,7 +123,13 @@ foo@bar:~$ git clone https://github.com/adafruit/Adafruit_Python_BMP.git
 foo@bar:~$ cd Adafruit_Python_BMP
 foo@bar:~$ sudo python3 setup.py install
 ```
-
+c. Adafruit DTH Python
+Biblioteca necessária para coletar dados de umidade e temperatura através do sensor DHT11 ou DHT22
+```console
+foo@bar:~$ git clone https://github.com/adafruit/Adafruit_Python_DHT.git
+foo@bar:~$ cd Adafruit_Python_DHT
+foo@bar:~$ sudo python3 setup.py install
+```
 
 ### ***3.2 Banco de Dados***
 
@@ -187,6 +195,7 @@ Collection: log_temperatura (Atualizar no script com o novo nome)
 
 Copie o script para o raspberry pi e crie um arquivo no diretório chamado .env com o seguinte conteúdo:
 ```
+SQLSERVER= <SQL_SERVER>
 SQLDBNAME= <SQL_DB_NAME>
 SQLTABLENAME= <SQL_TABLE_NAME>
 USER_SQL= <SQL_USER_LOGIN>
