@@ -12,7 +12,7 @@ Este projeto visa capturar dados de sensores ligados a um raspberry pi e armazen
 
 Arquitetura (alto nível)
 
-![alt text](https://github.com/dgeraldi/PiClima/blob/main/Files/PiClima.png)
+![alt text](https://github.com/dgeraldi/PiClima/blob/main/Files/PiClima_v2.png)
 
 
 ## ***3 INSTALAÇÃO***
