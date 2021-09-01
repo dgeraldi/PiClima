@@ -30,10 +30,10 @@ include("dados.php");
 				//ScrollColumn2D
 				"numVisiblePlot"=> "30",
 				"scrollheight"=> "7",
-          		"flatScrollBars"=> "1",
-           		"scrollShowButtons"=> "0",
-            	"scrollColor"=> "#cccccc",
-            	"showHoverEffect"=> "1",
+				"flatScrollBars"=> "1",
+				"scrollShowButtons"=> "0",
+				"scrollColor"=> "#cccccc",
+				"showHoverEffect"=> "1",
 				"showborder" => "0",
 				"showplotborder" => "0",
 				"showcanvasborder" => "0",
@@ -87,5 +87,3 @@ include("dados.php");
         	$columnChart->render();
 
        	}
-
-?>
