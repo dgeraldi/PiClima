@@ -94,5 +94,4 @@ include("dados.php");
         	$columnChart3->render();
 
      	}
-
 ?>
