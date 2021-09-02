@@ -4,21 +4,37 @@
 ![GitHub](https://img.shields.io/github/license/dgeraldi/PiClima?style=plastic)  ![GitHub last commit](https://img.shields.io/github/last-commit/dgeraldi/PiClima?style=plastic)
 
 
-## ***1 OBJETIVO***
+Tabela de conteúdos
+=================
+  * [1 Objetivo](#objective)
+  * [2 Arquitetura](#arch)
+  * [3 Instalação](#install)
+    + [3.1 Pre-Requisitos](#prereqs)
+      - [3.1.2 Python 3.9](#python)
+      - [3.1.3 Dependencias](#dependencies)
+    + [3.2 Banco de Dados](#databases)
+      - [3.2.1 MySQL](#mysql)
+      - [3.2.2 MongoDB](#mongodb)
+  * [4 Como Usar](#howtouse)
+    + [4.1 Resultado PHP](#phpresults)
+  * [5 Solução de Problemas](#problemssolutions)
+
+
+## ***1 OBJETIVO***<a name="objective"></a>
 
 Este projeto visa capturar dados de sensores ligados a um raspberry pi e armazenamento em bases de dados para consulta online via frontend.
 
 
-## ***2 ARQUITETURA***
+## ***2 ARQUITETURA***<a name="arch"></a>
 
 Arquitetura (alto nível)
 
 ![alt text](https://github.com/dgeraldi/PiClima/blob/main/Files/PiClima_v2.png)
 
 
-## ***3 INSTALAÇÃO***
+## ***3 INSTALAÇÃO***<a name="install"></a>
 
-### ***3.1 Pre-Requisitos***
+### ***3.1 Pre-Requisitos***<a name="prereqs"></a>
 
 ![npm](https://img.shields.io/npm/v/npm?style=plastic)
 
@@ -39,8 +55,158 @@ Hardware:
 * Sensor de Pressão Barométrica BMP180
 * Sensor de Umidade e Temperatura DHT11 ou DHT22
 
-  
-#### 3.1.1 OpenSSL > v1.1.0 (Opcional), apenas caso ocorra um erro de SSL ao utilizar o pip
+
+#### 3.1.2 Python 3.9<a name="python"></a>
+
+Para este projeto utilizei o python3.9 para coleta dos dados dos sensores, para sua instalação pode-se utilizar o bom e velho ```sudo apt-get install python3.9``` após adicionar seu correto ppa ou compilando e instalando conforme a seguir (para meu caso, devido ao erro do ssl optei por compilar). 
+
+```console
+#Download da versão desejada
+foo@bar:~$ wget https://www.python.org/ftp/python/3.9.0/Python-3.9.0.tar.xz
+foo@bar:~$ tar -xvf Python-3.9.0.tar.xz
+foo@bar:~$ cd Python-3.9.0
+
+#Configure passando o openssl como parâmetro
+foo@bar:~$ ./configure --with-openssl=/usr/local/openssl --enable-optimizations
+foo@bar:~$ make
+foo@bar:~$ make install
+
+foo@bar:~$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.4 0
+foo@bar:~$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
+```
+
+
+#### 3.1.3 Dependencias<a name="dependencies"></a>
+
+Algumas das dependências necessárias para o script rodar corretamente:
+
+a. Mysqlclient, pymongo, spidev e dnspython
+Necessário para conectar com o mysql, mongoDB na nuvem
+
+```console
+foo@bar:~$ sudo pip3 install mysqlclient pymongo dnspython spidev
+```
+b. Adafruit BMP180 Python
+Biblioteca necessária para coletar os dados através do sensor BMP180
+
+```console
+foo@bar:~$ git clone https://github.com/adafruit/Adafruit_Python_BMP.git
+foo@bar:~$ cd Adafruit_Python_BMP
+foo@bar:~$ sudo python3 setup.py install
+```
+c. Adafruit DTH Python
+Biblioteca necessária para coletar dados de umidade e temperatura através do sensor DHT11 ou DHT22
+```console
+foo@bar:~$ git clone https://github.com/adafruit/Adafruit_Python_DHT.git
+foo@bar:~$ cd Adafruit_Python_DHT
+foo@bar:~$ sudo python3 setup.py install
+```
+
+### ***3.2 Banco de Dados***<a name="databases"></a>
+
+#### 3.2.1 Banco de Dados MySQL<a name="mysql"></a>
+
+Utualize o nome do database e table como desejado e atualize o arquivo .env conforme novos nomes.
+
+Database: tempodg
+Table: log_temperatura
+
+| COLUMN_NAME          | COLUMN_TYPE  | COLUMN_KEY | EXTRA          |
+|----------------------|--------------|------------|----------------|
+| id                   | int(11)      | PK         | auto_increment |
+| created              | timestamp    |            |                |
+| press_temperature    | decimal(4,2) |            |                |
+| pressure             | decimal(7,2) |            |                |
+| altitude             | int(4)       |            |                |
+| pressure_abs         | decimal(7,2) |            |                |
+| humidity             | decimal(4,2) |            |                |
+| hum_temperature      | decimal(4,2) |            |                |
+
+Após instalado o mysql com o método preferido, faz-se necessário criar a tabela e o database, para isso, acesso pelo terminao o mysql e digite:
+
+a. Criar database
+```sql
+create database tempodg;
+```
+
+b. Criar tabela
+```sql 
+CREATE TABLE `log_temperatura` ( `id` int(11) NOT NULL AUTO_INCREMENT,  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `press_temperature` decimal(4,2) NOT NULL,  `pressure` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressure_abs` decimal(7,2) NOT NULL, `humidity` decimal(4,2) NOT NULL, `hum_temperature` decimal(4,2) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+```
+
+c. Criar um usuário no mysql
+```sql 
+create user 'USUARIO'@'localhost' IDENTIFIED BY 'SENHA';
+```
+
+d. Garantir acesso ao banco
+```sql 
+grant all privileges on tempodg.* to 'USUARIO'@'localhost';
+```
+
+
+#### 3.2.2 Banco de dados MongoDB<a name="mongodb"></a>
+
+Para os serviços de banco de dados MONGO foi utilizado o MONGODB ATLAS.
+
+Database: weather_dg (Atualizar no script posteriormente com o novo nome)
+Collection: log_temperatura (Atualizar no script com o novo nome)
+
+| COLUMN                |
+|-----------------------|
+| _id: index            |
+| created               |
+| press_temperature     |
+| pressure               |
+| pressure_abs           |
+| altitude              |
+| humidity              |
+| hum_temperature       |
+
+
+## ***4 COMO USAR***<a name="howtouse"></a>
+
+Copie o repositório com os scripts para o raspberry pi e crie um arquivo no diretório chamado .env com o seguinte conteúdo:
+
+```
+SQLSERVER= <SQL_SERVER>
+SQLDBNAME= <SQL_DB_NAME>
+SQLTABLENAME= <SQL_TABLE_NAME>
+USER_SQL= <SQL_USER_LOGIN>
+SECRET_SQL= <SQL_DB_PASSWORD>
+USER_MONGO= <MONGO_USER_LOGIN>
+SECRET_MONGO= <MONGO_PASSWORD>
+LOCAL_ALTITUDE= <ALTITUDE_FROM_YOUR_LOCATION>
+```
+
+Para executar basta digitar o comando ```python3 main.py``` no terminal.
+
+Para realizar coleta de forma automática em períodos específicos, basta realizar o agendamento para execução automática utilizando o crontab.
+
+No terminal digite:
+```console
+foo@bar:~$ crontab -e
+```
+
+E insira a seguinte linha no final do arquivo para agendar a execução a cada 30 minutos o script localizado no diretorio home
+
+```console
+*/30 * * * * python3 ~/main.py
+```
+
+Com o PHP instalado, mova o diretório localweb movido para, caso linux, /var/www/html/localweb (fique a vontade para modificar o nome).
+
+Para visualizar seus dados, digite no browser http://localhost/localweb/temp.php
+
+
+### ***4.1 Resultado PHP***<a name="phpresults"></a>
+
+![image](https://user-images.githubusercontent.com/77708243/131910501-afab2bc4-858c-4af7-b86e-606b0983db04.png)
+
+
+## ***5 SOLUÇÃO DE PROBLEMAS***<a name="problemssolutions"></a>
+
+### ***3.1.1 OpenSSL > v1.1.0 (Opcional), apenas caso ocorra um erro de SSL ao utilizar o pip
 
 Ao instalar alguma dependência do python via pip o erro abaixo é retornado impedindo a correta instalação.
 
@@ -83,140 +249,4 @@ foo@bar:~$ echo "/usr/local/openssl/lib" >> /etc/ld.so.conf
 
 #checa a versão final
 foo@bar:~$ openssl version
-```
-
-
-#### 3.1.2 Python 3.9
-
-Para este projeto utilizei o python3.9 para coleta dos dados dos sensores, para sua instalação pode-se utilizar o bom e velho ```sudo apt-get install python3.9``` após adicionar seu correto ppa ou compilando e instalando conforme a seguir (para meu caso, devido ao erro do ssl optei por compilar). 
-
-```console
-#Download da versão desejada
-foo@bar:~$ wget https://www.python.org/ftp/python/3.9.0/Python-3.9.0.tar.xz
-foo@bar:~$ tar -xvf Python-3.9.0.tar.xz
-foo@bar:~$ cd Python-3.9.0
-
-#Configure passando o openssl como parâmetro
-foo@bar:~$ ./configure --with-openssl=/usr/local/openssl --enable-optimizations
-foo@bar:~$ make
-foo@bar:~$ make install
-
-foo@bar:~$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.4 0
-foo@bar:~$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
-```
-
-
-#### 3.1.3 Dependencias Específicas
-
-Algumas das dependências necessárias para o script rodar corretamente:
-
-a. Mysqlclient, pymongo, spidev e dnspython
-Necessário para conectar com o mysql, mongoDB na nuvem
-
-```console
-foo@bar:~$ sudo pip3 install mysqlclient pymongo dnspython spidev
-```
-b. Adafruit BMP180 Python
-Biblioteca necessária para coletar os dados através do sensor BMP180
-
-```console
-foo@bar:~$ git clone https://github.com/adafruit/Adafruit_Python_BMP.git
-foo@bar:~$ cd Adafruit_Python_BMP
-foo@bar:~$ sudo python3 setup.py install
-```
-c. Adafruit DTH Python
-Biblioteca necessária para coletar dados de umidade e temperatura através do sensor DHT11 ou DHT22
-```console
-foo@bar:~$ git clone https://github.com/adafruit/Adafruit_Python_DHT.git
-foo@bar:~$ cd Adafruit_Python_DHT
-foo@bar:~$ sudo python3 setup.py install
-```
-
-### ***3.2 Banco de Dados***
-
-#### 3.2.1 Banco de Dados MySQL
-
-Utualize o nome do database e table como desejado e atualize o arquivo .env conforme novos nomes.
-
-Database: tempodg
-Table: log_temperatura
-
-| COLUMN_NAME          | COLUMN_TYPE  | COLUMN_KEY | EXTRA          |
-|----------------------|--------------|------------|----------------|
-| id                   | int(11)      | PK         | auto_increment |
-| created              | timestamp    |            |                |
-| press_temperature    | decimal(4,2) |            |                |
-| pressure             | decimal(7,2) |            |                |
-| altitude             | int(4)       |            |                |
-| pressure_abs         | decimal(7,2) |            |                |
-| humidity             | decimal(4,2) |            |                |
-| hum_temperature      | decimal(4,2) |            |                |
-
-Após instalado o mysql com o método preferido, faz-se necessário criar a tabela e o database, para isso, acesso pelo terminao o mysql e digite:
-
-a. Criar database
-```sql
-create database tempodg;
-```
-
-b. Criar tabela
-```sql 
-CREATE TABLE `log_temperatura` ( `id` int(11) NOT NULL AUTO_INCREMENT,  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `press_temperature` decimal(4,2) NOT NULL,  `pressure` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressure_abs` decimal(7,2) NOT NULL, `humidity` decimal(4,2) NOT NULL, `hum_temperature` decimal(4,2) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-```
-
-c. Criar um usuário no mysql
-```sql 
-create user 'USUARIO'@'localhost' IDENTIFIED BY 'SENHA';
-```
-
-d. Garantir acesso ao banco
-```sql 
-grant all privileges on tempodg.* to 'USUARIO'@'localhost';
-```
-
-#### 3.2.2 Banco de dados MongoDB
-
-Para os serviços de banco de dados MONGO foi utilizado o MONGODB ATLAS.
-
-Database: weather_dg (Atualizar no script posteriormente com o novo nome)
-Collection: log_temperatura (Atualizar no script com o novo nome)
-
-| COLUMN                |
-|-----------------------|
-| _id: index            |
-| created               |
-| press_temperature     |
-| pressure               |
-| pressure_abs           |
-| altitude              |
-| humidity              |
-| hum_temperature       |
-
-#### 3.2.3 Executando e Agendando Execução automática
-
-Copie o script para o raspberry pi e crie um arquivo no diretório chamado .env com o seguinte conteúdo:
-```
-SQLSERVER= <SQL_SERVER>
-SQLDBNAME= <SQL_DB_NAME>
-SQLTABLENAME= <SQL_TABLE_NAME>
-USER_SQL= <SQL_USER_LOGIN>
-SECRET_SQL= <SQL_DB_PASSWORD>
-USER_MONGO= <MONGO_USER_LOGIN>
-SECRET_MONGO= <MONGO_PASSWORD>
-LOCAL_ALTITUDE= <ALTITUDE_FROM_YOUR_LOCATION>
-```
-
-Após, para executar basta digitar o comando ```python3 main.py``` no terminal.
-
-Para realizar coleta de forma automática de tempos em tempos, basta realizar o agendamento para execução automática utilizando o crontab.
-
-No terminal digite:
-```console
-foo@bar:~$ crontab -e
-```
-
-E insira a seguinte linha no final do arquivo para agendar a execução a cada 30 minutos o script localizado no diretorio home
-
-```console
-*/30 * * * * python3 ~/main.py
 ```
