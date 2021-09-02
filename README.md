@@ -10,8 +10,8 @@ Tabela de conteúdos
   * [2 Arquitetura](#arch)
   * [3 Instalação](#install)
     + [3.1 Pre-Requisitos](#prereqs)
-      - [3.1.2 Python 3.9](#python)
-      - [3.1.3 Dependencias](#dependencies)
+      - [3.1.1 Hardware](#hardware)
+      - [3.1.2 Dependencias](#dependencies)
     + [3.2 Banco de Dados](#databases)
       - [3.2.1 MySQL](#mysql)
       - [3.2.2 MongoDB](#mongodb)
@@ -37,8 +37,18 @@ Arquitetura (alto nível)
 ### ***3.1 Pre-Requisitos***<a name="prereqs"></a>
 
 ![npm](https://img.shields.io/npm/v/npm?style=plastic)
+  
+  
+#### 3.1.1 Hardware<a name="hardware"></a>
 
-Software:
+* Raspberry Pi (aqui na versão 3) com Raspbian (não testado com outras versões)
+* Sensor de Pressão Barométrica BMP180
+* Sensor de Umidade e Temperatura DHT11 ou DHT22
+
+
+#### 3.1.2 Dependencias<a name="dependencies"></a>
+
+Algumas das dependências necessárias para o script rodar corretamente:
 
 * Python 3.9
   * mysqlclient
@@ -48,15 +58,8 @@ Software:
   * Adafruit Python BMP180
   * Adafruit Python DHT
 * MySQL
-  
-Hardware:
 
-* Raspberry Pi (aqui na versão 3) com Raspbian (não testado com outras versões)
-* Sensor de Pressão Barométrica BMP180
-* Sensor de Umidade e Temperatura DHT11 ou DHT22
-
-
-#### 3.1.2 Python 3.9<a name="python"></a>
+a. Python 3.9
 
 Para este projeto utilizei o python3.9 para coleta dos dados dos sensores, para sua instalação pode-se utilizar o bom e velho ```sudo apt-get install python3.9``` após adicionar seu correto ppa ou compilando e instalando conforme a seguir (para meu caso, devido ao erro do ssl optei por compilar). 
 
@@ -75,18 +78,14 @@ foo@bar:~$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/
 foo@bar:~$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 ```
 
-
-#### 3.1.3 Dependencias<a name="dependencies"></a>
-
-Algumas das dependências necessárias para o script rodar corretamente:
-
-a. Mysqlclient, pymongo, spidev e dnspython
+b. Mysqlclient, pymongo, spidev e dnspython
 Necessário para conectar com o mysql, mongoDB na nuvem
 
 ```console
 foo@bar:~$ sudo pip3 install mysqlclient pymongo dnspython spidev
 ```
-b. Adafruit BMP180 Python
+
+c. Adafruit BMP180 Python
 Biblioteca necessária para coletar os dados através do sensor BMP180
 
 ```console
@@ -94,13 +93,15 @@ foo@bar:~$ git clone https://github.com/adafruit/Adafruit_Python_BMP.git
 foo@bar:~$ cd Adafruit_Python_BMP
 foo@bar:~$ sudo python3 setup.py install
 ```
-c. Adafruit DTH Python
+
+d. Adafruit DTH Python
 Biblioteca necessária para coletar dados de umidade e temperatura através do sensor DHT11 ou DHT22
 ```console
 foo@bar:~$ git clone https://github.com/adafruit/Adafruit_Python_DHT.git
 foo@bar:~$ cd Adafruit_Python_DHT
 foo@bar:~$ sudo python3 setup.py install
 ```
+
 
 ### ***3.2 Banco de Dados***<a name="databases"></a>
 
@@ -206,7 +207,7 @@ Para visualizar seus dados, digite no browser http://localhost/localweb/temp.php
 
 ## ***5 SOLUÇÃO DE PROBLEMAS***<a name="problemssolutions"></a>
 
-### ***3.1.1 OpenSSL > v1.1.0 (Opcional), apenas caso ocorra um erro de SSL ao utilizar o pip
+## ***5.1 OpenSSL > v1.1.0 (Opcional, apenas caso ocorra um erro de SSL ao utilizar o pip)
 
 Ao instalar alguma dependência do python via pip o erro abaixo é retornado impedindo a correta instalação.
 
