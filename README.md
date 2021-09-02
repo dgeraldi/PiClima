@@ -1,4 +1,5 @@
 # ***PiClima***
+![image](https://user-images.githubusercontent.com/77708243/131872337-883f6ac5-8b04-41ee-9f14-99911d1daf91.png)
 
 ![GitHub](https://img.shields.io/github/license/dgeraldi/PiClima?style=plastic)  ![GitHub last commit](https://img.shields.io/github/last-commit/dgeraldi/PiClima?style=plastic)
 
