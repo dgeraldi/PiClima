@@ -1,3 +1,3 @@
-Put this files in your raspberry pi and create a crontab to run your script as wish.
+Coloque esses arquivos em seu raspberry pi e crie um crontab para rodar o script na frequência desejada
 
-Don't forget to install mysql server first and create an account in mongodb.
+Não se esqueça de instalar o mysql/mariadb e alterar o nome do arquivo .env_template para .env e preencher com o dados do seu ambiente

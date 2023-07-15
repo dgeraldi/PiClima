@@ -27,9 +27,11 @@ Este projeto visa capturar dados de sensores ligados a um raspberry pi e armazen
 
 ## ***2 ARQUITETURA***<a name="arch"></a>
 
-Arquitetura (alto nível)
+Arquitetura lógica
 
 ![alt text](https://github.com/dgeraldi/PiClima/blob/main/Files/PiClima_v2.png)
+
+Conexão física
 
 
 ## ***3 INSTALAÇÃO***<a name="install"></a>
@@ -50,18 +52,22 @@ Arquitetura (alto nível)
 
 Algumas das dependências necessárias para o script rodar corretamente:
 
-* Python 3.9
+* PHP
+* Python
+  * Python 3.9
   * mysqlclient
+  * python-decouple
   * pymongo
   * dnspython
-  * spidev
   * Adafruit Python BMP180
   * Adafruit Python DHT
+* Composer
+* I2C habilitado
 * MySQL
 
 a. Python 3.9
 
-Para este projeto utilizei o python3.9 para coleta dos dados dos sensores, para sua instalação pode-se utilizar o bom e velho ```sudo apt-get install python3.9``` após adicionar seu correto ppa ou compilando e instalando conforme a seguir (para meu caso, devido ao erro do ssl optei por compilar). 
+Para este projeto utilizei o python3.9 para coleta dos dados dos sensores, para sua instalação pode-se utilizar ```sudo apt-get install python3.9``` após adicionar seu correto PPA ou compilando e instalando conforme a seguir. 
 
 ```console
 #Download da versão desejada
@@ -78,14 +84,37 @@ foo@bar:~$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/
 foo@bar:~$ sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.9 1
 ```
 
-b. Mysqlclient, pymongo, spidev e dnspython
-Necessário para conectar com o mysql, mongoDB na nuvem
+b. Mysqlclient, Python-Decouple, pymongo e dnspython
+Necessário para conectar com o mysql local e mongoDB na nuvem
 
 ```console
-foo@bar:~$ sudo pip3 install mysqlclient pymongo dnspython spidev
+foo@bar:~$ sudo pip3 install mysqlclient python-decouple pymongo dnspython
 ```
 
-c. Adafruit BMP180 Python
+c. Composer
+Gerenciador de dependências para PHP, utilizado para a dependência vlucas/phpdotenv que possibilita captura de variáveis em arquivo de ambiente (.env).
+
+```console
+foo@bar:~$ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+foo@bar:~$ php -r "if (hash_file('sha384', 'composer-setup.php') === 'e21205b207c3ff031906575712edab6f13eb0b361f2085f1f1237b7126d785e826a450292b6cfd1d64d92e6563bbde02') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+foo@bar:~$ php composer-setup.php
+foo@bar:~$ php -r "unlink('composer-setup.php');"
+foo@bar:~$ sudo mv composer.phar /usr/local/bin/composer
+```
+
+Instalar as dependências existentes no arquivo composer.json
+
+```console
+foo@bar:~$ composer install
+```
+
+Ou
+
+```console
+foo@bar:~$ composer require vlucas/phpdotenv
+```
+
+d. Adafruit BMP180 Python
 Biblioteca necessária para coletar os dados através do sensor BMP180
 
 ```console
@@ -94,7 +123,7 @@ foo@bar:~$ cd Adafruit_Python_BMP
 foo@bar:~$ sudo python3 setup.py install
 ```
 
-d. Adafruit DTH Python
+e. Adafruit DHT Python
 Biblioteca necessária para coletar dados de umidade e temperatura através do sensor DHT11 ou DHT22
 ```console
 foo@bar:~$ git clone https://github.com/adafruit/Adafruit_Python_DHT.git
@@ -102,12 +131,34 @@ foo@bar:~$ cd Adafruit_Python_DHT
 foo@bar:~$ sudo python3 setup.py install
 ```
 
+f. Habilitar interface I2C
+Digitar no console
+```console
+foo@bar:~$ sudo raspi-config
+```
+
+Selecionar no menu Interface Options->I2C e habilitar a opção.
+
 
 ### ***3.2 Banco de Dados***<a name="databases"></a>
 
 #### 3.2.1 Banco de Dados MySQL<a name="mysql"></a>
 
-Utualize o nome do database e table como desejado e atualize o arquivo .env conforme novos nomes.
+Após instalado o mysql/mariadb, faz-se necessário criar o database e a tabela conforme esquema a seguir
+
+a. Criar database
+Escolha o nome que desejar e atulize o arquivo /sensors/.env
+
+```sql
+create database tempodg;
+```
+
+b. Criar tabela
+Utilize o nome da tabela que desejar e atualize o arquivo /sensors/.env conforme novos nomes.
+
+```sql 
+CREATE TABLE `log_temperatura` ( `id` int(11) NOT NULL AUTO_INCREMENT,  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `press_temperature` decimal(4,2) NOT NULL,  `pressure` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressure_abs` decimal(7,2) NOT NULL, `humidity` decimal(4,2) NOT NULL, `hum_temperature` decimal(4,2) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+```
 
 Database: tempodg
 Table: log_temperatura
@@ -123,26 +174,15 @@ Table: log_temperatura
 | humidity             | decimal(4,2) |            |                |
 | hum_temperature      | decimal(4,2) |            |                |
 
-Após instalado o mysql com o método preferido, faz-se necessário criar a tabela e o database, para isso, acesso pelo terminao o mysql e digite:
-
-a. Criar database
-```sql
-create database tempodg;
-```
-
-b. Criar tabela
-```sql 
-CREATE TABLE `log_temperatura` ( `id` int(11) NOT NULL AUTO_INCREMENT,  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `press_temperature` decimal(4,2) NOT NULL,  `pressure` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressure_abs` decimal(7,2) NOT NULL, `humidity` decimal(4,2) NOT NULL, `hum_temperature` decimal(4,2) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-```
 
 c. Criar um usuário no mysql
 ```sql 
-create user 'USUARIO'@'localhost' IDENTIFIED BY 'SENHA';
+CREATE USER 'USUARIO'@'localhost' IDENTIFIED BY 'SENHA';
 ```
 
 d. Garantir acesso ao banco
 ```sql 
-grant all privileges on tempodg.* to 'USUARIO'@'localhost';
+GRANT ALL PRIVILEGES ON tempodg.* TO 'USUARIO'@'localhost';
 ```
 
 
@@ -167,24 +207,32 @@ Collection: log_temperatura (Atualizar no script com o novo nome)
 
 ## ***4 COMO USAR***<a name="howtouse"></a>
 
-Copie o repositório com os scripts para o raspberry pi e crie um arquivo no diretório chamado .env com o seguinte conteúdo:
+* Copie o repositório com os scripts para o raspberry pi e crie um arquivo no diretório /sensors/ chamado .env com o seguinte conteúdo:
 
 ```
-SQLSERVER= <SQL_SERVER>
-SQLDBNAME= <SQL_DB_NAME>
-SQLTABLENAME= <SQL_TABLE_NAME>
-USER_SQL= <SQL_USER_LOGIN>
-SECRET_SQL= <SQL_DB_PASSWORD>
-USER_MONGO= <MONGO_USER_LOGIN>
-SECRET_MONGO= <MONGO_PASSWORD>
-LOCAL_ALTITUDE= <ALTITUDE_FROM_YOUR_LOCATION>
+#Database SQL
+SQLSERVER=localhost
+SQLDBNAME=dbName
+SQLTABLENAME=tableName
+
+USER_SQL=SQL User Name
+SECRET_SQL=password SQL
+
+#Database Mongo
+USER_MONGO=Mongo User Name
+SECRET_MONGO=password Mongo
+
+#Used by python classes do calibrate the sensors
+LOCAL_ALTITUDE=470
+HUMIDITY_PIN=24 (GPIO Pin Number para sensor Umidade)
 ```
 
-Para executar basta digitar o comando ```python3 main.py``` no terminal.
+* Para executar basta digitar o comando ```python3 main.py``` no terminal.
 
-Para realizar coleta de forma automática em períodos específicos, basta realizar o agendamento para execução automática utilizando o crontab.
+* Para realizar coleta de forma automática em períodos específicos, basta realizar o agendamento para execução automática utilizando o crontab.
 
 No terminal digite:
+
 ```console
 foo@bar:~$ crontab -e
 ```
@@ -195,9 +243,9 @@ E insira a seguinte linha no final do arquivo para agendar a execução a cada 3
 */30 * * * * python3 ~/main.py
 ```
 
-Com o PHP instalado, mova o diretório localweb movido para, caso linux, /var/www/html/localweb (fique a vontade para modificar o nome).
+* Mova o conteúdo do diretório ```/localweb/*``` para o diretório do apache nomeando sua página ```/var/www/html/PiClima```
 
-Para visualizar seus dados, digite no browser http://localhost/localweb/temp.php
+Para visualizar seus dados, digite no browser http://localhost/PiClima/temp.php
 
 
 ### ***4.1 Resultado PHP***<a name="phpresults"></a>
