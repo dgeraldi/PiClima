@@ -14,6 +14,7 @@
 
   <?php
   include("gtemp.php");
+  include("gtemp_monthly.php");
   include("gpress.php");
   include("ghumidity.php");
   include("dados.php");
@@ -47,6 +48,10 @@
           <div class="card__icon"><i class="fas fa-tint"></i></div>
           <h2 class="card__title"><?= number_format($row['humidity'], 0) ?>&#37;</h2>
         </div>
+        <div class="card card-4">
+          <div class="card__icon"><i class="fas fa-tint"></i></div>
+          <h2 class="card__title"><?= number_format($row['hum_temperature'], 0) ?>&#8451;</h2>
+        </div>
   </section>
 
 
@@ -62,6 +67,9 @@
     </div>
     <div id="4" class="divTableRow">
       <div id="chart-3" align=center class="divTableCell"></div>
+    </div>
+    <div id="5" class="divTableRow">
+      <div id="chart-4" align=center class="divTableCell"></div>
     </div>
   </div>
   </div>

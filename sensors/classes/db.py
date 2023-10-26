@@ -25,13 +25,11 @@ __license__ = 'MIT'
 #***************************************************
 import datetime
 import time
-import logging
-from logging.handlers import RotatingFileHandler
-import sys
 import MySQLdb as mysql
 import pymongo
 import urllib.parse
 from decouple import config
+from classes.log_file import LogFile 
 
 class DB:
 	"""Main class that collect all data and save into databases"""
@@ -55,19 +53,8 @@ class DB:
 		self.pressure_abs = absolutePressure
 		self.humidity = humidity
 		self.hum_temperature = hum_temperature
-
 		
-		#Create rotating log files, alternating between 5 files when the file reaches 5MB
-		logFormatter = logging.Formatter('%(asctime)s - %(levelname)s - %(funcName)s(%(lineno)d) - %(message)s',"%d-%m-%Y %H:%M:%S")
-		logFile = '/var/log/PiClima/db.log'
-		logHandler = RotatingFileHandler(logFile, mode='a', maxBytes=5*1024*1024, 
-                                 backupCount=3, encoding=None, delay=0)
-		logHandler.setFormatter(logFormatter)
-		logHandler.setLevel(logging.INFO)
-
-		self.logger = logging.getLogger('DB')
-		self.logger.setLevel(logging.INFO)
-		self.logger.addHandler(logHandler)
+		self.sensor_logger = LogFile(self.__class__.__name__)
 
 	#*********************************************************
 	def saveDBSQL(self):
@@ -90,17 +77,20 @@ class DB:
 			#Insert into DB
 			sql = "Insert into "+ self.SQLTABLENAME +" (press_temperature,pressure,altitude,pressure_abs, humidity, hum_temperature) \
 			VALUES ('%s','%s','%s','%s','%s','%s')" % \
-			( self.press_temperature, self.pressure_rel, self.localAltitude, self.pressure_abs, self.humidity, self.hum_temperature)
+			( round(self.press_temperature), self.pressure_rel, self.localAltitude, self.pressure_abs, round(self.humidity), round(self.hum_temperature))
 
 			cursor.execute(sql)
 			db.commit()
 			db.close()
 
 			#print("SUCCESS: Data sent to the local database.")
-			self.logger.info("Data sent to the local database! Temp: %s;Rel Press:%s;Alt:%s;Humidity:%s;Hum. Temp:%s", self.press_temperature, float("{0:0.2f}".format(self.pressure_rel)),self.localAltitude,self.humidity,self.hum_temperature)
+			self.sensor_logger.log("info",f'Data sent to the LOCAL database! Temp: {self.press_temperature};Rel Press: {float("{0:0.2f}".format(self.pressure_rel))};Alt:{self.localAltitude};Humidity:{"{0:0.2f}%".format(self.humidity)};Hum. Temp:{"{0:0.2f}C".format(self.hum_temperature)}')
+
+			#self.sensor_logger.log("INFO","Data sent to the local database! Temp: %s;Rel Press:%s;Alt:%s;Humidity:%s;Hum. Temp:%s", self.press_temperature, float("{0:0.2f}".format(self.pressure_rel)),self.localAltitude,self.humidity,self.hum_temperature)		
 		except mysql.Error as e:
 			#print("ERROR: was not possible to save data on LOCAL database:: ", e)
-			self.logger.exception("Failure to save data on LOCAL database::")
+			self.sensor_logger.log("error","Failure to save data on LOCAL database::")
+			
 
 			db.rollback()
 			return False
@@ -147,9 +137,9 @@ class DB:
 			#Insere documento um a um
 			collection.insert_one(document)
 			#print("SUCCESS: Data sent to the cloud database.")
-			self.logger.info("Data sent to the cloud database! Temp: %s;Rel Press:%s;Alt:%s;Humidity:%s;Hum. Temp:%s", self.press_temperature, float("{0:0.2f}".format(self.pressure_rel)),self.localAltitude,self.humidity,self.hum_temperature)
+			self.sensor_logger.log("info",f'Data sent to the CLOUD database! Temp: {self.press_temperature};Rel Press: {float("{0:0.2f}".format(self.pressure_rel))};Alt:{self.localAltitude};Humidity:{"{0:0.2f}%".format(self.humidity)};Hum. Temp:{"{0:0.2f}C".format(self.hum_temperature)}')
 		except Exception as e:
 			#print("ERROR: was not possible to save data on CLOUD database:: ",e)
-			self.logger.exception("Failure to save data on CLOUD database::")
+			self.sensor_logger.log("error","Failure to save data on CLOUD database::")
 
 			return False

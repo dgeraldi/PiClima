@@ -1,7 +1,7 @@
 <?php
 require 'vendor/autoload.php';
 //Set the correct directory to your .env file
-$dotenv = Dotenv\Dotenv::createImmutable('/home/pi');
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable('/home/pi');
 $dotenv->load();
 
 //Get .env variables

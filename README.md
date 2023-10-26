@@ -45,7 +45,7 @@ Conexão física
 
 * Raspberry Pi (aqui na versão 3) com Raspbian (não testado com outras versões)
 * Sensor de Pressão Barométrica BMP180
-* Sensor de Umidade e Temperatura DHT11 ou DHT22
+* Sensor de Umidade e Temperatura DHT11, DHT22 ou AHT10
 
 
 #### 3.1.2 Dependencias<a name="dependencies"></a>
@@ -61,6 +61,7 @@ Algumas das dependências necessárias para o script rodar corretamente:
   * dnspython
   * Adafruit Python BMP180
   * Adafruit Python DHT
+  * SMBUS (para AHT10 - sem biblioteca necessária)
 * Composer
 * I2C habilitado
 * MySQL
@@ -210,21 +211,35 @@ Collection: log_temperatura (Atualizar no script com o novo nome)
 * Copie o repositório com os scripts para o raspberry pi e crie um arquivo no diretório /sensors/ chamado .env com o seguinte conteúdo:
 
 ```
+#*******************
 #Database SQL
 SQLSERVER=localhost
 SQLDBNAME=dbName
 SQLTABLENAME=tableName
+USER_SQL=usrName
+SECRET_SQL=passwordSQL
 
-USER_SQL=SQL User Name
-SECRET_SQL=password SQL
-
+#*******************
 #Database Mongo
-USER_MONGO=Mongo User Name
-SECRET_MONGO=password Mongo
+SEND_TO_MONGO=true
+USER_MONGO=usrName
+SECRET_MONGO=passwordMongo
 
-#Used by python classes do calibrate the sensors
+#*******************
+#Activate sensors setting true or false (lower case)
+#Pressure - BMP180
+PRESSURE=true
+#Local altitute to compensate pressure from sea level
 LOCAL_ALTITUDE=470
-HUMIDITY_PIN=24 (GPIO Pin Number para sensor Umidade)
+
+#Humidity - DHT11 or AHT10
+HUMIDITY=true
+#Use which sensor
+DHT_SENSOR=false
+AHT_SENSOR=true
+
+#When not using I2C, like in DHT11, uncomment the line below to set data pin on raspberry
+HUMIDITY_PIN=24
 ```
 
 * Para executar basta digitar o comando ```python3 main.py``` no terminal.
