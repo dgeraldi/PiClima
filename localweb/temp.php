@@ -14,7 +14,6 @@
 
   <?php
   include("gtemp.php");
-  include("gtemp_monthly.php");
   include("gpress.php");
   include("ghumidity.php");
   include("dados.php");
@@ -30,7 +29,9 @@
         <span class="merriweather tera ls-xlarge light">πClima</span><br>
         <span class="epsilon ls-small">
           <?php
-          echo "Último Refresh: " . date("h:i:sa");
+            $output = shell_exec("cat /sys/devices/virtual/thermal/thermal_zone0/temp");
+            $output = str_replace('temp=', '', $output);
+            echo "Último Refresh: " . date("h:i:sa") . " - GPU: " . round($output/1000,2);
           ?></span>
       </h1>
     </div>
@@ -39,6 +40,8 @@
         <div class="card card-1">
           <div class="card__icon"><i class="fas fa-temperature-high"></i></div>
           <h2 class="card__title"><?= number_format($row['hum_temperature'], 0) ?>&#8451;</h2>
+          <br>
+          <h6 class="card__subtitle"><?= number_format($row['heat_index'], 0) ?>&#8451;</h6>
         </div>
         <div class="card card-2">
           <div class="card__icon"><i class="fas fa-tachometer-alt"></i></div>

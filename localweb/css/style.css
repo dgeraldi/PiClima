@@ -43,7 +43,14 @@ font-size:14;
   text-decoration: none;
   color: rgba(255, 255, 255, 0.9);
 }
-
+.card__title {
+  display: relative;
+  margin-top: 5px; /* Adjust the margin as needed */
+}
+.card__subtitle {
+  display: relative;
+  margin-top: 5px; /* Adjust the margin as needed */
+}
 .main-container {
   padding: 10px;
 }

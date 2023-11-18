@@ -13,9 +13,6 @@
 
 	Args
 		All sensors data existent
-        
-        From BMP180:
-        Temperature, relativePressure,localAltitude,absolutePressure
 """
 
 __title__ = 'PiClima - Databases'
@@ -34,7 +31,7 @@ from classes.log_file import LogFile
 class DB:
 	"""Main class that collect all data and save into databases"""
 
-	def __init__(self,press_temperature,relativePressure,localAltitude,absolutePressure, humidity, hum_temperature):
+	def __init__(self,press_temperature,relativePressure,localAltitude,absolutePressure, humidity, hum_temperature, heat_index):
 		"""Init all variables and get all environment variables"""
 
 		self.SQLDBNAME = config('SQLDBNAME')
@@ -43,6 +40,9 @@ class DB:
 		self.USER_SQL = config('USER_SQL')
 		self.SECRET_MONGO = config('SECRET_MONGO')
 		self.USER_MONGO = config('USER_MONGO')
+		self.MONGO_DBNAME = config('MONGO_DBNAME')
+		self.MONGO_COLLECTIONNAME = config('MONGO_COLLECTIONNAME')
+
 
 		self.ts = time.time()
 		self.created = 0
@@ -53,6 +53,7 @@ class DB:
 		self.pressure_abs = absolutePressure
 		self.humidity = humidity
 		self.hum_temperature = hum_temperature
+		self.heat_index = heat_index
 		
 		self.sensor_logger = LogFile(self.__class__.__name__)
 
@@ -75,23 +76,22 @@ class DB:
 			cursor = db.cursor()
 
 			#Insert into DB
-			sql = "Insert into "+ self.SQLTABLENAME +" (press_temperature,pressure,altitude,pressure_abs, humidity, hum_temperature) \
-			VALUES ('%s','%s','%s','%s','%s','%s')" % \
-			( round(self.press_temperature), self.pressure_rel, self.localAltitude, self.pressure_abs, round(self.humidity), round(self.hum_temperature))
+			sql = "Insert into "+ self.SQLTABLENAME +" (press_temperature,pressure,altitude,pressure_abs, humidity, hum_temperature, heat_index) \
+			VALUES ('%s','%s','%s','%s','%s','%s','%s')" % \
+			( self.press_temperature, self.pressure_rel, self.localAltitude, self.pressure_abs, self.humidity, self.hum_temperature,self.heat_index)
 
 			cursor.execute(sql)
 			db.commit()
 			db.close()
 
 			#print("SUCCESS: Data sent to the local database.")
-			self.sensor_logger.log("info",f'Data sent to the LOCAL database! Temp: {self.press_temperature};Rel Press: {float("{0:0.2f}".format(self.pressure_rel))};Alt:{self.localAltitude};Humidity:{"{0:0.2f}%".format(self.humidity)};Hum. Temp:{"{0:0.2f}C".format(self.hum_temperature)}')
+			self.sensor_logger.log("info",f'Data sent to the LOCAL database! Temp: {self.press_temperature};Rel Press: {float("{0:0.2f}".format(self.pressure_rel))};Alt:{self.localAltitude};Humidity:{"{0:0.2f}%".format(self.humidity)};Hum. Temp:{"{0:0.2f}C".format(self.hum_temperature)};Heat Index:{"{0:0.2f}C".format(self.heat_index)}')
 
 			#self.sensor_logger.log("INFO","Data sent to the local database! Temp: %s;Rel Press:%s;Alt:%s;Humidity:%s;Hum. Temp:%s", self.press_temperature, float("{0:0.2f}".format(self.pressure_rel)),self.localAltitude,self.humidity,self.hum_temperature)		
 		except mysql.Error as e:
 			#print("ERROR: was not possible to save data on LOCAL database:: ", e)
-			self.sensor_logger.log("error","Failure to save data on LOCAL database::")
+			self.sensor_logger.log("error",f"Failure to save data on LOCAL database:: {e}")
 			
-
 			db.rollback()
 			return False
 
@@ -110,18 +110,18 @@ class DB:
 		"""
 		try:
 			#Envia copia para banco mongodb em nuvem
-			mongo_uri = "mongodb+srv://"+self.USER_MONGO+":"+ urllib.parse.quote_plus(self.SECRET_MONGO)+"@cluster0.tdpte.mongodb.net/weather_dg?retryWrites=true&w=majority"
+			mongo_uri = "mongodb+srv://"+self.USER_MONGO+":"+ urllib.parse.quote_plus(self.SECRET_MONGO)+"@cluster0.oce9hop.mongodb.net/"+self.MONGO_DBNAME+"?retryWrites=true&w=majority"
 
-			client = pymongo.MongoClient(mongo_uri,ssl=True,ssl_cert_reqs='CERT_NONE')
+			client = pymongo.MongoClient(mongo_uri,ssl=True)
 
 			self.created = datetime.datetime.fromtimestamp(self.ts).strftime('%d-%m-%Y %H:%M:%S') #Date and time
 			#db = client.test
 
 			#Select o database
-			db = client.weather_dg
+			db = client[self.MONGO_DBNAME]
 
 			#Select a collection
-			collection = db.log_temperatura
+			collection = db[self.MONGO_COLLECTIONNAME]
 
 			#Send collection para MongoDB
 			document = {
@@ -130,8 +130,10 @@ class DB:
 				"pressure":float("{0:0.2f}".format(self.pressure_rel)),
 				"pressure_abs":float("{0:0.2f}".format(self.pressure_abs)),
 				"altitude": int(self.localAltitude),
-				"humidity": self.humidity,
-				"hum_temperature":self.hum_temperature
+				"humidity": float("{0:0.2f}".format(self.humidity)),
+				"hum_temperature":float("{0:0.2f}".format(self.hum_temperature)),
+				"heat_index":float("{0:0.2f}".format(self.heat_index)),
+
 				}
 
 			#Insere documento um a um
@@ -140,6 +142,6 @@ class DB:
 			self.sensor_logger.log("info",f'Data sent to the CLOUD database! Temp: {self.press_temperature};Rel Press: {float("{0:0.2f}".format(self.pressure_rel))};Alt:{self.localAltitude};Humidity:{"{0:0.2f}%".format(self.humidity)};Hum. Temp:{"{0:0.2f}C".format(self.hum_temperature)}')
 		except Exception as e:
 			#print("ERROR: was not possible to save data on CLOUD database:: ",e)
-			self.sensor_logger.log("error","Failure to save data on CLOUD database::")
+			self.sensor_logger.log("error",f"Failure to save data on CLOUD database:: {e}")
 
 			return False

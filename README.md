@@ -62,6 +62,7 @@ Algumas das dependências necessárias para o script rodar corretamente:
   * Adafruit Python BMP180
   * Adafruit Python DHT
   * SMBUS (para AHT10 - sem biblioteca necessária)
+  * Colorama - For pretty console prints
 * Composer
 * I2C habilitado
 * MySQL
@@ -158,7 +159,7 @@ b. Criar tabela
 Utilize o nome da tabela que desejar e atualize o arquivo /sensors/.env conforme novos nomes.
 
 ```sql 
-CREATE TABLE `log_temperatura` ( `id` int(11) NOT NULL AUTO_INCREMENT,  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `press_temperature` decimal(4,2) NOT NULL,  `pressure` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressure_abs` decimal(7,2) NOT NULL, `humidity` decimal(4,2) NOT NULL, `hum_temperature` decimal(4,2) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE `log_temperatura` ( `id` int(11) NOT NULL AUTO_INCREMENT,  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,  `press_temperature` decimal(4,2) NOT NULL,  `pressure` decimal(7,2) NOT NULL, `altitude` int(4) NOT NULL, `pressure_abs` decimal(7,2) NOT NULL, `humidity` decimal(4,2) NOT NULL, `hum_temperature` decimal(4,2) NOT NULL,`heat_index` decimal(4,2) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 ```
 
 Database: tempodg
@@ -174,6 +175,7 @@ Table: log_temperatura
 | pressure_abs         | decimal(7,2) |            |                |
 | humidity             | decimal(4,2) |            |                |
 | hum_temperature      | decimal(4,2) |            |                |
+| heat_index           | decimal(4,2) |            |                |
 
 
 c. Criar um usuário no mysql
@@ -199,11 +201,12 @@ Collection: log_temperatura (Atualizar no script com o novo nome)
 | _id: index            |
 | created               |
 | press_temperature     |
-| pressure               |
-| pressure_abs           |
+| pressure              |
+| pressure_abs          |
 | altitude              |
 | humidity              |
 | hum_temperature       |
+| heat_index            |
 
 
 ## ***4 COMO USAR***<a name="howtouse"></a>
@@ -221,9 +224,11 @@ SECRET_SQL=passwordSQL
 
 #*******************
 #Database Mongo
-SEND_TO_MONGO=true
+SEND_TO_MONGO=false
 USER_MONGO=usrName
 SECRET_MONGO=passwordMongo
+MONGO_DBNAME=weather_dg
+MONGO_COLLECTIONNAME=log_weather
 
 #*******************
 #Activate sensors setting true or false (lower case)

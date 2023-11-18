@@ -21,7 +21,7 @@ $sql = "SELECT hum_temperature, pressure, created, humidity from log_temperatura
 $result = $conn->query($sql) or exit("Error code ({$conn->errno}): {$conn->error}");
 
 //Get only the first row
-$lastData = "SELECT hum_temperature,pressure, humidity FROM log_temperatura ORDER BY id DESC LIMIT 1";
+$lastData = "SELECT hum_temperature,pressure, humidity, heat_index FROM log_temperatura ORDER BY id DESC LIMIT 1";
 $lastDataResult = $conn->query($lastData) or exit("Error code ({$conn->errno}): {$conn->error}");
 
 $conn->close();

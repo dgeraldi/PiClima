@@ -22,7 +22,7 @@ if ($result) {
 			"divlineThickness" => "1",
 			"divLineDashLen" => "1",
 			"yAxisMaxValue" => "1030",
-			"yAxisMinValue" => "1005",
+			"yAxisMinValue" => "980",
 			"decimals" => "0",
 			"thousandSeparator" => ".",
 			"formatNumberScale" => "0",

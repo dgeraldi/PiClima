@@ -71,7 +71,7 @@ if ($result) {
 		array_push(
 			$dataArray,
 			array(
-				"value" => $row["hum_temperature"]
+				"value" => number_format($row["hum_temperature"],0)
 			)
 
 		);

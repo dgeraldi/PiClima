@@ -4,27 +4,27 @@ include("dados.php");
      	if ($result) {
         	// The `$arrData` array holds the chart attributes and data
         	$arrData3 = array(
-        	    "chart" => array(
-       			"caption" => "Umidade",
-    			"xAxisName" => "Dias/Horas",
-        		"yAxisName" => "Umidade %",
-        		"paletteColors" => "#0075c2",
-        		"valueFontColor" => "#000033",
-        		"baseFont" => "Helvetica Neue,Arial",
-        		"captionFontSize" => "14",
-        		"subcaptionFontSize" => "14",
-        		"subcaptionFontBold" => "0",
-        		"placeValuesInside" => "1",
-        		"rotateValues" => "1",
-        		"showShadow" => "0",
-        		"divlineColor" => "#999999",
-        		"divLineDashed" => "1",
-        		"divlineThickness" => "1",
-        		"divLineDashLen" => "1",
-				"yAxisMaxValue" => "45",
+				"chart" => array(
+				"caption" => "Umidade",
+				"xAxisName" => "Dias/Horas",
+				"yAxisName" => "Umidade %",
+				"paletteColors" => "#0075c2",
+				"valueFontColor" => "#000033",
+				"baseFont" => "Helvetica Neue,Arial",
+				"captionFontSize" => "14",
+				"subcaptionFontSize" => "14",
+				"subcaptionFontBold" => "0",
+				"placeValuesInside" => "1",
+				"rotateValues" => "1",
+				"showShadow" => "0",
+				"divlineColor" => "#999999",
+				"divLineDashed" => "1",
+				"divlineThickness" => "1",
+				"divLineDashLen" => "1",
+				"yAxisMaxValue" => "100",
 				"yAxisMinValue" => "0",
 				"decimals" => "0",
-		        "thousandSeparator" => ".",
+				"thousandSeparator" => ".",
 				"formatNumberScale" => "0",
 				"showvalues" => "1",
 				"showborder" => "0",
@@ -36,10 +36,10 @@ include("dados.php");
 				//scrollArea2D
 				"numVisiblePlot"=> "30",
 				"scrollheight"=> "7",
-          		"flatScrollBars"=> "1",
-           		"scrollShowButtons"=> "0",
-            	"scrollColor"=> "#cccccc",
-            	"showHoverEffect"=> "1",
+				"flatScrollBars"=> "1",
+				"scrollShowButtons"=> "0",
+				"scrollColor"=> "#cccccc",
+				"showHoverEffect"=> "1",
 				"showborder" => "0",
 				"showplotborder" => "0",
 				"showcanvasborder" => "0",
@@ -60,10 +60,10 @@ include("dados.php");
 		{
 				//Only for Area2d
           	 	/*array_push($arrData2["data"], array(
-             		 	"label" => date("d/m H:i", strtotime($row3['created'])),
-              			"value" => $row3["humidity"]
-              			)
-           		);*/
+     				 	"label" => date("d/m H:i", strtotime($row3['created'])),
+      					"value" => $row3["humidity"]
+      					)
+   				);*/
 
         	//Only scrollarea2d
 				array_push($categoryArray3, array(
@@ -72,7 +72,7 @@ include("dados.php");
 				 );
 
 				array_push($dataArray3, array(
-					"value" => $row3["humidity"]
+					"value" => number_format($row3["humidity"],0)
 					)
 
 				);
