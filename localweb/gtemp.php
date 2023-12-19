@@ -2,7 +2,117 @@
 include("fusioncharts.php");
 include("dados.php");
 
-// If the query returns a valid response, prepare the JSON string
+
+//For 2D Column WITH Heat Index Line
+if ($result) {
+	// The `$arrData` array holds the chart attributes and data
+	$arrData = array(
+	"chart" => array(
+	"caption"=> "Temperatura & Heat Index",
+	"xAxisname"=> "Dias/Horas",
+	"yAxisName"=> "Celsius",
+	"paletteColors" => "#0075c2,#cc0000",
+	"baseFont" => "Helvetica Neue,Arial",
+	"captionFontSize" => "14",
+	"subcaptionFontSize" => "14",
+	"subcaptionFontBold" => "0",
+	"placeValuesInside" => "1",
+	"showShadow" => "0",
+	"usePlotGradientColor" => "0",
+	"bgAlpha" => "0",
+	"canvasBgAlpha" => "0",
+	"divlineColor"=> "#999999",
+	"divLineIsDashed"=> "1",
+	"divLineDashLen"=> "1",
+	"divLineGapLen"=> "1",
+	"showHoverEffect"=> "1",
+	"showborder" => "0",
+	"showplotborder" => "0",
+	"showcanvasborder" => "0",
+	//Values
+	"numVisiblePlot"=> "27",
+	"yAxisMaxValue"=>"50",
+	"showLineValues"=> "1",
+	"valuePosition"=> "ABOVE",
+	"valueFontColor" => "#000000",
+	"valuePadding"=>"5",
+	//"numberSuffix"=> "°C",
+	//Tooltip
+	"toolTipColor"=> "#ffffff",
+	"toolTipBorderThickness"=> "0",
+	"toolTipBgColor"=> "#000000",
+	"toolTipBgAlpha"=> "80",
+	"toolTipBorderRadius"=> "2",
+	"toolTipPadding"=> "5",
+	//Scroll
+	"scrollheight"=> "10",
+	"flatScrollBars"=> "1",
+	"scrollShowButtons"=> "0",
+	"scrollColor"=> "#cccccc",
+	"scrollPadding" => "5",
+
+		)
+	);
+
+$categoryArray = array();
+$tempDataArray = array();
+$heatIndexDataArray = array();
+
+// Fetch data from the result and populate arrays
+while ($row = mysqli_fetch_array($result)) {
+	// Populate category array
+	array_push(
+		$categoryArray,
+		array(
+			"label" => date("d/m H:i", strtotime($row['created']))
+		)
+	);
+
+	// Populate Temperature data array
+	array_push(
+		$tempDataArray,
+		array(
+			"value" => number_format($row["hum_temperature"], 0)
+		)
+		);
+	// Assuming $row["heat_index"] contains Heat Index data in the same loop
+	array_push(
+		$heatIndexDataArray,
+		array(
+			"value" => number_format($row["heat_index"], 0)
+		)
+		);
+}
+
+// Form the dataset structure for Temperature and Heat Index
+$arrData["dataset"] = array(
+	array(
+		"seriesName" => "Temperatura",
+		"data" => $tempDataArray
+	),
+	array(
+		"seriesName" => "Heat Index",
+		"renderAs" => "line",
+		"data" => $heatIndexDataArray
+	)
+);
+
+// Set the categories
+$arrData["categories"] = array(
+	array(
+		"category" => $categoryArray
+	)
+);
+$jsonEncodedData = json_encode($arrData);
+
+$columnChart = new FusionCharts("scrollcombi2d", "chartTemp", 800, 300, "chart-1", "json", $jsonEncodedData);
+// Render the chart
+$columnChart->render();
+}
+
+//********************************************/
+//For 2D Column only with no Heat Index line
+/*
 if ($result) {
 	// The `$arrData` array holds the chart attributes and data
 	$arrData = array(
@@ -43,24 +153,13 @@ if ($result) {
 		)
 	);
 
-	//Column3D array
-	//$arrData["data"] = array();
-
 	//scrollColumn2d arrays
 	$categoryArray = array();
 	$dataArray = array();
 
 	// Push the data into the array
 	while ($row = mysqli_fetch_array($result)) {
-		//Only for Column3D
-		/*array_push($arrData["data"], array(
-             		 	"label" => date("d/m H:i", strtotime($row['created'])),
-             		 	"value" => $row["hum_temperature"]
-              			)
-           		);*/
 
-
-		//Only scrollColumn2d
 		array_push(
 			$categoryArray,
 			array(
@@ -80,13 +179,12 @@ if ($result) {
 	$arrData["dataset"] = array(array("data" => $dataArray));
 	$arrData["categories"] = array(array("category" => $categoryArray));
 
-	/*JSON Encode the data to retrieve the string containing the JSON representation of the data in the array. */
 	$jsonEncodedData = json_encode($arrData);
-
-	/*Create an object for the column chart using the FusionCharts PHP class constructor. Syntax for the constructor is ` FusionCharts("type of chart", "unique chart id", width of the chart, height of the chart, "div id to render the chart", "data format", "data source")`. Because we are using JSON data to render the chart, the data format will be `json`. The variable `$jsonEncodeData` holds all the JSON data for the chart, and will be passed as the value for the data source parameter of the constructor.*/
 
 	$columnChart = new FusionCharts("scrollColumn2d", "chartTemp", 800, 300, "chart-1", "json", $jsonEncodedData);
 	// Render the chart
 	$columnChart->render();
 }
+*/
+/*****************************************************/
 ?>

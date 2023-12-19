@@ -17,7 +17,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
 
-$sql = "SELECT hum_temperature, pressure, created, humidity from log_temperatura ORDER BY created DESC LIMIT 120";
+$sql = "SELECT hum_temperature, pressure, created, humidity, heat_index from log_temperatura ORDER BY created DESC LIMIT 120";
 $result = $conn->query($sql) or exit("Error code ({$conn->errno}): {$conn->error}");
 
 //Get only the first row
