@@ -33,6 +33,7 @@ Arquitetura lógica
 
 Conexão física
 
+![alt text](https://github.com/dgeraldi/PiClima/blob/main/Files/PiClima%20Schematic/Schematic_Raspberry%20Pi_2023-11-20.png)
 
 ## ***3 INSTALAÇÃO***<a name="install"></a>
 
