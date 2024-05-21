@@ -270,8 +270,7 @@ Para visualizar seus dados, digite no browser http://localhost/PiClima/temp.php
 
 ### ***4.1 Resultado PHP***<a name="phpresults"></a>
 
-![image](https://user-images.githubusercontent.com/77708243/131910501-afab2bc4-858c-4af7-b86e-606b0983db04.png)
-
+![image](https://github.com/dgeraldi/PiClima/blob/main/Files/PiClima%20Homepage.png)
 
 ## ***5 SOLUÇÃO DE PROBLEMAS***<a name="problemssolutions"></a>
 
